@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, LogIn, Coffee } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Mail, Lock, LogIn } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -17,10 +17,16 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await axios.post('/api/auth/login', {
+        email,
+        password
+      });
+
       login(res.data.token, res.data.user);
       navigate('/dashboard');
+
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -29,71 +35,83 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center container mx-auto px-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-base-100 p-8 rounded-[40px] shadow-2xl border border-base-200"
+    <div className="mx-auto max-w-md w-full p-10 m-16 bg-[#F4F3F0] rounded-sm shadow-sm border border-amber-950/20">
+
+      {/* Title */}
+      <h1
+        className="text-4xl text-center font-bold text-amber-950/90 mb-8"
+        style={{ fontFamily: 'Rancho, cursive' }}
       >
-        <div className="text-center mb-8">
-          <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary">
-            <Coffee size={32} />
+        Login Now!
+      </h1>
+
+      {/* Error */}
+      {error && (
+        <div className="mb-4 text-red-600 text-sm text-center font-semibold">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* Email */}
+        <div>
+          <label className="block mb-1 font-semibold text-amber-950/70">
+            Email
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-3 text-amber-950/40" size={18} />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="Enter your email"
+              className="w-full pl-10 p-2.5 bg-white border-none outline-none rounded-sm text-amber-950/90 focus:ring-1 focus:ring-[#D2B48C]"
+            />
           </div>
-          <h2 className="text-3xl font-serif font-bold">Welcome Back</h2>
-          <p className="text-base-content/60">Log in to your Brew Haven account</p>
         </div>
 
-        {error && (
-          <div className="alert alert-error mb-6 rounded-2xl">
-            <span>{error}</span>
+        {/* Password */}
+        <div>
+          <label className="block mb-1 font-semibold text-amber-950/70">
+            Password
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-3 text-amber-950/40" size={18} />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Enter password"
+              className="w-full pl-10 p-2.5 bg-white border-none outline-none rounded-sm text-amber-950/90 focus:ring-1 focus:ring-[#D2B48C]"
+            />
           </div>
-        )}
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="form-control">
-            <label className="label font-bold text-sm">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" size={18} />
-              <input 
-                type="email" 
-                className="input input-bordered w-full pl-12 rounded-2xl bg-base-200 border-none focus:outline-primary"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
+        {/* Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full mt-2 bg-[#D2B48C] hover:bg-[#c4a47c] text-[#331A15] font-bold py-2.5 rounded-sm border border-[#331A15] transition flex items-center justify-center gap-2"
+          style={{ fontFamily: 'cursive' }}
+        >
+          <LogIn size={18} />
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
 
-          <div className="form-control">
-            <label className="label font-bold text-sm">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" size={18} />
-              <input 
-                type="password" 
-                className="input input-bordered w-full pl-12 rounded-2xl bg-base-200 border-none focus:outline-primary"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            className={`btn btn-primary w-full rounded-2xl h-14 font-bold text-lg gap-2 mt-4 ${loading ? 'loading' : ''}`}
-            disabled={loading}
-          >
-            {!loading && <LogIn size={20} />}
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        <p className="text-center mt-8 text-base-content/60">
-          Don't have an account? <Link to="/register" className="text-primary font-bold hover:underline">Sign up now</Link>
-        </p>
-      </motion.div>
+      {/* Register link */}
+      <p className="text-center mt-8 text-amber-950/60 text-sm">
+        Don’t have an account?{' '}
+        <Link
+          to="/register"
+          className="font-bold text-amber-950 hover:underline"
+        >
+          Create one
+        </Link>
+      </p>
     </div>
   );
 };

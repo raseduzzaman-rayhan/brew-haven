@@ -1,112 +1,129 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { User, Mail, Lock, UserPlus, Coffee } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      return setError("Passwords do not match");
+    }
+
     setLoading(true);
-    setError('');
+    setError("");
+
     try {
-      await axios.post('/api/auth/register', { name, email, password });
-      navigate('/login');
+      await axios.post("/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center container mx-auto px-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-base-100 p-8 rounded-[40px] shadow-2xl border border-base-200"
+    <div className="mx-auto border border-amber-950/30 bg-[#F4F3F0] rounded-2xl max-w-md w-full p-10 m-16">
+
+      <h1
+        className="text-5xl text-center font-bold text-amber-950/90 mb-10 tracking-wider"
+        style={{ fontFamily: "Rancho, cursive" }}
       >
-        <div className="text-center mb-8">
-          <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary">
-            <Coffee size={32} />
-          </div>
-          <h2 className="text-3xl font-serif font-bold">Join the Brew</h2>
-          <p className="text-base-content/60">Create your Brew Haven account</p>
-        </div>
+        Register Now!
+      </h1>
 
-        {error && (
-          <div className="alert alert-error mb-6 rounded-2xl">
-            <span>{error}</span>
-          </div>
-        )}
+      {error && (
+        <p className="text-red-500 text-center mb-4 text-sm">{error}</p>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="form-control">
-            <label className="label font-bold text-sm">Full Name</label>
-            <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" size={18} />
-              <input 
-                type="text" 
-                className="input input-bordered w-full pl-12 rounded-2xl bg-base-200 border-none focus:outline-primary"
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-6"
+        style={{ fontFamily: "Rancho, cursive" }}>
 
-          <div className="form-control">
-            <label className="label font-bold text-sm">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" size={18} />
-              <input 
-                type="email" 
-                className="input input-bordered w-full pl-12 rounded-2xl bg-base-200 border-none focus:outline-primary"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
+        {/* Name */}
+        <input
+          type="text"
+          placeholder="Enter Your Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="w-full bg-transparent border-b border-amber-950/50 focus:border-amber-950/90 outline-none text-amber-950/90 py-2 text-[16px] placeholder-amber-950/60"
+        />
 
-          <div className="form-control">
-            <label className="label font-bold text-sm">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" size={18} />
-              <input 
-                type="password" 
-                className="input input-bordered w-full pl-12 rounded-2xl bg-base-200 border-none focus:outline-primary"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
+        {/* Email */}
+        <input
+          type="email"
+          placeholder="Enter Your Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full bg-transparent border-b border-amber-950/50 focus:border-amber-950/90 outline-none text-amber-950/90 py-2 text-[16px] placeholder-amber-950/60"
+        />
 
-          <button 
-            type="submit" 
-            className={`btn btn-primary w-full rounded-2xl h-14 font-bold text-lg gap-2 mt-4 ${loading ? 'loading' : ''}`}
-            disabled={loading}
+        {/* Password */}
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full bg-transparent border-b border-amber-950/50 focus:border-amber-950/90 outline-none text-amber-950/90 py-2 text-[16px] placeholder-amber-950/60"
+        />
+
+        {/* Confirm Password */}
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          className="w-full bg-transparent border-b border-amber-950/50 focus:border-amber-950/90 outline-none text-amber-950/90 py-2 text-[16px] placeholder-amber-950/60"
+        />
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-amber-950/90 border border-amber-950/60 text-white hover:bg-white hover:text-[#372727] font-bold text-[18px] rounded-xl py-3 transition-all duration-500 mt-4 active:scale-95 shadow-lg"
+        >
+          {loading ? "Creating..." : "Create an account"}
+        </button>
+      </form>
+
+      {/* Social login */}
+      <div className="mt-5">
+     
+      </div>
+
+      {/* Login link */}
+      <div className="text-center mt-10 border-t border-amber-950/10 pt-6">
+        <p
+          className="text-sm text-amber-950/40"
+          style={{ fontFamily: "Rancho, cursive" }}
+        >
+          Already have an account?{" "}
+          <NavLink
+            to="/login"
+            className="text-amber-950/60 font-bold hover:text-amber-950/90 transition-all ml-1 hover:underline underline-offset-4"
           >
-            {!loading && <UserPlus size={20} />}
-            {loading ? 'Creating account...' : 'Register'}
-          </button>
-        </form>
-
-        <p className="text-center mt-8 text-base-content/60">
-          Already have an account? <Link to="/login" className="text-primary font-bold hover:underline">Log in now</Link>
+            Login
+          </NavLink>
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 };
