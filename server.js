@@ -14,17 +14,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-
-// ✅ PORT FIX (IMPORTANT)
 const PORT = process.env.PORT || 3000;
-
-// 🔐 JWT SECRET
 const JWT_SECRET = process.env.JWT_SECRET || 'coffee-secret-key-123';
 
 // ---------------- MIDDLEWARE ----------------
 app.use(express.json());
 
-// CORS (production safe)
 app.use(
   cors({
     origin: process.env.CLIENT_URL || '*',
@@ -36,9 +31,9 @@ app.use(
 let db;
 try {
   db = await initDb();
-  console.log('Database connected');
+  console.log('✅ Database connected');
 } catch (err) {
-  console.error('DB connection failed:', err);
+  console.error('❌ DB connection failed:', err);
 }
 
 // ---------------- AUTH MIDDLEWARE ----------------
@@ -53,14 +48,14 @@ const authMiddleware = (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
 
 const adminMiddleware = (req, res, next) => {
   if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Admin access required' });
+    return res.status(403).json({ message: 'Admin only' });
   }
   next();
 };
@@ -97,15 +92,10 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
 
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
     const isValid = await bcrypt.compare(password, user.password);
-
-    if (!isValid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+    if (!isValid) return res.status(401).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign(
       {
@@ -127,18 +117,21 @@ app.post('/api/auth/login', async (req, res) => {
         role: user.role,
       },
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 // ---------------- PRODUCTS ----------------
-app.get('https://brew-haven-re66.onrender.com/api/products', async (req, res) => {
+
+// GET all
+app.get('/api/products', async (req, res) => {
   const products = await db.all('SELECT * FROM products');
   res.json(products);
 });
 
-app.get('https://brew-haven-re66.onrender.com/api/products/:id', async (req, res) => {
+// GET single
+app.get('/api/products/:id', async (req, res) => {
   const product = await db.get(
     'SELECT * FROM products WHERE id = ?',
     [req.params.id]
@@ -151,7 +144,8 @@ app.get('https://brew-haven-re66.onrender.com/api/products/:id', async (req, res
   res.json(product);
 });
 
-app.post('https://brew-haven-re66.onrender.com/api/products', authMiddleware, adminMiddleware, async (req, res) => {
+// CREATE
+app.post('/api/products', authMiddleware, adminMiddleware, async (req, res) => {
   const { name, category, price, image, description } = req.body;
 
   try {
@@ -168,12 +162,13 @@ app.post('https://brew-haven-re66.onrender.com/api/products', authMiddleware, ad
       image,
       description,
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.put('https://brew-haven-re66.onrender.com/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
+// UPDATE
+app.put('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { name, category, price, image, description } = req.body;
 
   try {
@@ -183,12 +178,13 @@ app.put('https://brew-haven-re66.onrender.com/api/products/:id', authMiddleware,
     );
 
     res.json({ message: 'Product updated' });
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.delete('https://brew-haven-re66.onrender.com/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
+// DELETE
+app.delete('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
   await db.run('DELETE FROM products WHERE id=?', [req.params.id]);
   res.json({ message: 'Product deleted' });
 });
@@ -216,17 +212,14 @@ app.post('/api/orders', authMiddleware, async (req, res) => {
 
     await db.run('COMMIT');
 
-    res.status(201).json({
-      orderId,
-      message: 'Order placed successfully',
-    });
-  } catch (err) {
+    res.status(201).json({ orderId, message: 'Order placed successfully' });
+  } catch {
     await db.run('ROLLBACK');
     res.status(500).json({ message: 'Order failed' });
   }
 });
 
-// ---------------- STATIC FRONTEND ----------------
+// ---------------- FRONTEND ----------------
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
 
@@ -242,7 +235,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(vite.middlewares);
 }
 
-// ---------------- START SERVER ----------------
+// ---------------- START ----------------
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import logo from '../assets/logo.png';
 import bgImage from '../assets/bg_pattern.jpg';
-
 import { FaMagnifyingGlass, FaChevronDown } from 'react-icons/fa6';
 import { RiMenu2Line } from 'react-icons/ri';
 import { FaSignInAlt, FaUserPlus, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';

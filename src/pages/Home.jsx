@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowRight, Coffee, ShieldCheck, Truck, Clock } from 'lucide-react';
 import bgImage from '../assets/bg_main.png';
+import bgImageCTA from '../assets/dashboard_bg.jpg';
 
 const Home = () => {
   return (
@@ -36,12 +37,12 @@ const Home = () => {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <Link to="/menu" className="btn btn-primary btn-lg rounded-full px-10 font-bold gap-2">
+                <Link to="/menu" className="btn bg-amber-950   text-white rounded-4xl px-10 py-2 border-amber-950 hover:bg-white hover:text-amber-950 gap-2">
                   Order Now <ArrowRight size={20} />
                 </Link>
                 <Link
                   to="/about"
-                  className="btn btn-outline btn-lg rounded-full px-10 text-white border-white hover:bg-white hover:text-black"
+                  className="btn bg-white text-amber-950 rounded-4xl px-10 py-2 border-amber-950 hover:bg-amber-950 hover:text-white"
                 >
                   Our Story
                 </Link>
@@ -64,13 +65,13 @@ const Home = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="flex flex-col items-center text-center p-8 bg-white/10 backdrop-blur-md rounded-3xl text-white border border-white/10"
+              className="flex flex-col items-center text-center p-8 bg-amber-950/90 backdrop-blur-md rounded-3xl text-white border border-"
             >
-              <div className="w-16 h-16 rounded-2xl bg-primary/20 text-primary flex items-center justify-center mb-6">
+              <div className="w-16 h-16 rounded-xl bg-primary/20 text-white/90 flex items-center justify-center mb-6">
                 {React.cloneElement(f.icon, { size: 32 })}
               </div>
               <h3 className="text-xl font-bold mb-2">{f.title}</h3>
-              <p className="text-white/70">{f.desc}</p>
+              <p className="text-white/90">{f.desc}</p>
             </motion.div>
           ))}
         </section>
@@ -85,7 +86,7 @@ const Home = () => {
             <img
               src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&q=80&w=800"
               alt="Crafting Coffee"
-              className="rounded-[40px] shadow-2xl w-full"
+              className="rounded-md shadow-md w-full"
               referrerPolicy="no-referrer"
             />
           </motion.div>
@@ -95,61 +96,31 @@ const Home = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 italic text-primary">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 italic text-amber-950/90">
               Made with Love, Crafted with Precision
             </h2>
 
-            <p className="text-lg text-white/80 mb-6 leading-relaxed">
+            <p className="text-lg text-gray-900 mb-6 leading-relaxed">
               Our baristas are artists. Each cup is a masterpiece of temperature, timing, and technique.
             </p>
 
-            <ul className="space-y-4 mb-8 font-medium">
+            <ul className="space-y-4 text-amber-950 mb-8 font-medium">
               <li className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-primary" /> Ethically Sourced Coffee Beans
+                <span className="w-2 h-2 rounded-full bg-amber-950" /> Ethically Sourced Coffee Beans
               </li>
               <li className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-primary" /> House-Made Syrups & Flavors
+                <span className="w-2 h-2 rounded-full bg-amber-950" /> House-Made Syrups & Flavors
               </li>
               <li className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-primary" /> Expert Baristas
+                <span className="w-2 h-2 rounded-full bg-amber-950" /> Expert Baristas
               </li>
             </ul>
 
-            <Link to="/about" className="btn btn-primary rounded-full px-8">
+            <Link to="/about" className="btn bg-amber-950   text-white rounded-4xl px-10 py-2 border-amber-950 hover:bg-white hover:text-amber-950 gap-2">
               Discover More
             </Link>
           </motion.div>
         </section>
-
-        {/* CTA Section */}
-        <section className="container mx-auto px-4 md:px-8">
-          <div className="bg-primary rounded-[40px] p-10 md:p-20 text-primary-content text-center relative overflow-hidden">
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
-                Join the Brew Haven Family
-              </h2>
-
-              <p className="text-xl mb-10 opacity-90 max-w-2xl mx-auto">
-                Subscribe for exclusive offers and updates.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="input input-lg bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-full w-full"
-                />
-                <button className="btn btn-lg bg-white text-primary border-none rounded-full font-bold px-10">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl" />
-          </div>
-        </section>
-
       </div>
     </div>
   );
