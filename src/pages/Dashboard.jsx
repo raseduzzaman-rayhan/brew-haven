@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingBag, CheckCircle, Clock, Package, User, MoreHorizontal } from 'lucide-react';
 import { motion } from 'motion/react';
+import bgImage from '../assets/dashboard_bg.jpg';
+import bgImage1 from '../assets/7.png';
 
 const Dashboard = () => {
   const { user, token } = useAuth();
@@ -21,7 +23,6 @@ const Dashboard = () => {
 
       console.log("ORDERS API RESPONSE:", res.data);
 
-      // ✅ SAFE FIX (handles all backend formats)
       const safeOrders =
         Array.isArray(res.data)
           ? res.data
@@ -80,20 +81,35 @@ const Dashboard = () => {
     );
 
   return (
-    <div className="container mx-auto px-4 md:px-8 py-12">
+    <div className="container mx-auto px-4 md:px-8 py-12"
+      style={{ backgroundImage: `url(${bgImage1})` }}
+    >
 
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 bg-primary p-8 md:p-12 rounded-[40px] text-primary-content shadow-xl">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-2">
+      <div
+        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 p-8 md:p-12 rounded-md text-primary-content shadow-xl bg-cover bg-center relative"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      >
+        {/* Overlay (optional but recommended) */}
+        <div className="absolute inset-0 rounded-md"></div>
+
+        <div className="relative z-10">
+          <h1 className="text-3xl md:text-5xl font-bold mb-2 text-[#331A15]"
+            style={{ fontFamily: 'Rancho, cursive' }}
+          >
             My Dashboard
           </h1>
-          <p className="text-xl opacity-90">
-            Welcome back, {user?.name || "User"} {user?.role === 'admin' ? '(Administrator)' : ''}
+          <p className="text-xl opacity-90 text-amber-950/90">
+            Welcome back, {user?.name
+              ? user.name.charAt(0).toUpperCase() + user.name.slice(1)
+              : "User"}
+            {user?.role === 'admin' ? '(Administrator)' : ''}
           </p>
         </div>
 
-        <div className="stat bg-white/10 rounded-3xl text-white py-4 px-8">
+        <div className="stat rounded-md text-white py-4 px-8 text-right relative z-10"
+          style={{ backgroundImage: `url(${bgImage1})` }}
+        >
           <div className="stat-title text-white/70">Total Orders</div>
           <div className="stat-value">{orders.length}</div>
         </div>

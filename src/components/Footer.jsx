@@ -1,5 +1,5 @@
 import React from 'react';
-import footerBg from '../assets/13.jpg';
+import footerBg from '../assets/dashboard_bg.jpg';
 import FooterLeft from '../components/FooterLeft';
 import FooterRight from '../components/FooterRight';
 import FooterLine from '../components/FooterLine';
