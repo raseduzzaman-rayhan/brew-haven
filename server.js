@@ -133,12 +133,12 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ---------------- PRODUCTS ----------------
-app.get('/api/products', async (req, res) => {
+app.get('https://brew-haven-re66.onrender.com/api/products', async (req, res) => {
   const products = await db.all('SELECT * FROM products');
   res.json(products);
 });
 
-app.get('/api/products/:id', async (req, res) => {
+app.get('https://brew-haven-re66.onrender.com/api/products/:id', async (req, res) => {
   const product = await db.get(
     'SELECT * FROM products WHERE id = ?',
     [req.params.id]
@@ -151,7 +151,7 @@ app.get('/api/products/:id', async (req, res) => {
   res.json(product);
 });
 
-app.post('/api/products', authMiddleware, adminMiddleware, async (req, res) => {
+app.post('https://brew-haven-re66.onrender.com/api/products', authMiddleware, adminMiddleware, async (req, res) => {
   const { name, category, price, image, description } = req.body;
 
   try {
@@ -173,7 +173,7 @@ app.post('/api/products', authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-app.put('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.put('https://brew-haven-re66.onrender.com/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { name, category, price, image, description } = req.body;
 
   try {
@@ -188,7 +188,7 @@ app.put('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) =
   }
 });
 
-app.delete('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.delete('https://brew-haven-re66.onrender.com/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
   await db.run('DELETE FROM products WHERE id=?', [req.params.id]);
   res.json({ message: 'Product deleted' });
 });

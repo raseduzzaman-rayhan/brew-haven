@@ -36,7 +36,7 @@ const AddCoffee = () => {
     try {
       setLoading(true);
 
-      await axios.post('/api/products', payload, {
+      await axios.post('https://brew-haven-re66.onrender.com/api/products', payload, {
         headers: {
           Authorization: `Bearer ${token}`
         }

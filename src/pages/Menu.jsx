@@ -14,7 +14,7 @@ const Menu = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('/api/products');
+        const res = await axios.get('https://brew-haven-re66.onrender.com/api/products');
         setProducts(res.data);
         setFiltered(res.data);
       } catch (err) {
