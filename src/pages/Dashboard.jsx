@@ -39,12 +39,19 @@ const Dashboard = () => {
 
   const updateStatus = async (orderId, status) => {
     try {
-      await axios.patch(`/api/orders/${orderId}/status`, { status }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.patch(
+        `http://localhost:3000/api/orders/${orderId}/status`,
+        { status },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      console.log("UPDATED:", res.data);
       fetchOrders();
+
     } catch (err) {
-      alert("Failed to update status");
+      console.error("ERROR:", err.response?.data || err.message);
     }
   };
 
@@ -172,7 +179,7 @@ const Dashboard = () => {
                 <tbody>
                   {orders.map((order) => (
                     <motion.tr
-                      key={order.id}
+                      key={order._id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
@@ -222,23 +229,26 @@ const Dashboard = () => {
                       {user?.role === 'admin' && (
                         <td>
                           <div className="dropdown dropdown-left">
-                            <label className="btn btn-ghost btn-sm">
+                            <button tabIndex={0} className="btn btn-ghost btn-sm">
                               <MoreHorizontal size={16} />
-                            </label>
+                            </button>
 
-                            <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
+                            <ul
+                              tabIndex={0}
+                              className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40"
+                            >
                               <li>
-                                <button onClick={() => updateStatus(order.id, 'pending')}>
+                                <button onClick={() => updateStatus(order._id, 'pending')}>
                                   Pending
                                 </button>
                               </li>
                               <li>
-                                <button onClick={() => updateStatus(order.id, 'completed')}>
+                                <button onClick={() => updateStatus(order._id, 'completed')}>
                                   Completed
                                 </button>
                               </li>
                               <li>
-                                <button onClick={() => updateStatus(order.id, 'cancelled')}>
+                                <button onClick={() => updateStatus(order._id, 'cancelled')}>
                                   Cancel
                                 </button>
                               </li>

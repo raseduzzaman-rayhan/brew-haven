@@ -40,9 +40,7 @@ try {
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
 
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -123,28 +121,22 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ---------------- PRODUCTS ----------------
-
-// GET all
 app.get('/api/products', async (req, res) => {
   const products = await db.all('SELECT * FROM products');
   res.json(products);
 });
 
-// GET single
 app.get('/api/products/:id', async (req, res) => {
   const product = await db.get(
     'SELECT * FROM products WHERE id = ?',
     [req.params.id]
   );
 
-  if (!product) {
-    return res.status(404).json({ message: 'Product not found' });
-  }
+  if (!product) return res.status(404).json({ message: 'Product not found' });
 
   res.json(product);
 });
 
-// CREATE
 app.post('/api/products', authMiddleware, adminMiddleware, async (req, res) => {
   const { name, category, price, image, description } = req.body;
 
@@ -154,20 +146,12 @@ app.post('/api/products', authMiddleware, adminMiddleware, async (req, res) => {
       [name, category, price, image, description]
     );
 
-    res.status(201).json({
-      id: result.lastID,
-      name,
-      category,
-      price,
-      image,
-      description,
-    });
+    res.status(201).json({ id: result.lastID, ...req.body });
   } catch {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// UPDATE
 app.put('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { name, category, price, image, description } = req.body;
 
@@ -183,13 +167,14 @@ app.put('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) =
   }
 });
 
-// DELETE
 app.delete('/api/products/:id', authMiddleware, adminMiddleware, async (req, res) => {
   await db.run('DELETE FROM products WHERE id=?', [req.params.id]);
   res.json({ message: 'Product deleted' });
 });
 
 // ---------------- ORDERS ----------------
+
+// CREATE ORDER
 app.post('/api/orders', authMiddleware, async (req, res) => {
   const { total_price, items } = req.body;
 
@@ -197,8 +182,8 @@ app.post('/api/orders', authMiddleware, async (req, res) => {
     await db.run('BEGIN TRANSACTION');
 
     const orderResult = await db.run(
-      'INSERT INTO orders (user_id, total_price) VALUES (?, ?)',
-      [req.user.id, total_price]
+      'INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, ?)',
+      [req.user.id, total_price, 'pending']
     );
 
     const orderId = orderResult.lastID;
@@ -213,9 +198,65 @@ app.post('/api/orders', authMiddleware, async (req, res) => {
     await db.run('COMMIT');
 
     res.status(201).json({ orderId, message: 'Order placed successfully' });
-  } catch {
+  } catch (err) {
     await db.run('ROLLBACK');
+    console.error(err);
     res.status(500).json({ message: 'Order failed' });
+  }
+});
+
+// GET ORDERS
+app.get('/api/orders', authMiddleware, async (req, res) => {
+  try {
+    let orders;
+
+    if (req.user.role === 'admin') {
+      orders = await db.all(`
+        SELECT o.*, u.name as user_name
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        ORDER BY o.id DESC
+      `);
+    } else {
+      orders = await db.all(
+        `SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC`,
+        [req.user.id]
+      );
+    }
+
+    for (let order of orders) {
+      const items = await db.all(
+        `SELECT oi.*, p.name, p.price
+         FROM order_items oi
+         JOIN products p ON oi.product_id = p.id
+         WHERE oi.order_id = ?`,
+        [order.id]
+      );
+
+      order.items = items;
+    }
+
+    res.json({ orders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
+
+// 🔥 UPDATE ORDER STATUS (ADMIN)
+app.patch('/api/orders/:id/status', authMiddleware, adminMiddleware, async (req, res) => {
+  const { status } = req.body;
+
+  try {
+    await db.run(
+      'UPDATE orders SET status = ? WHERE id = ?',
+      [status, req.params.id]
+    );
+
+    res.json({ message: 'Order status updated' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to update status' });
   }
 });
 
