@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 const CartContext = createContext(undefined);
 
@@ -14,12 +15,39 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+
   const addToCart = (product) => {
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
+
       if (existing) {
-        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+        // Already exists alert
+        Swal.fire({
+          position: "top-end",
+          icon: 'info',
+          title: 'Already in Cart',
+          text: 'This product is already in your cart!',
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+        return prev.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       }
+
+      // Added successfully alert
+      Swal.fire({
+        position: "top-end",
+        icon: 'success',
+        title: 'Added!',
+        text: 'Product added to cart successfully!',
+        timer: 1500,
+        showConfirmButton: false
+      });
+
       return [...prev, { ...product, quantity: 1 }];
     });
   };

@@ -14,51 +14,32 @@ const Menu = () => {
 
   const extractProducts = (res) => {
     const d = res.data;
-
-    console.log("🔍 API DATA:", d);
-
     if (Array.isArray(d)) return d;
     if (Array.isArray(d?.products)) return d.products;
     if (Array.isArray(d?.data)) return d.data;
     if (Array.isArray(d?.result)) return d.result;
-
-    console.error("❌ Unknown API format:", d);
     return [];
   };
 
-  // 🚀 Fetch Products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(
           'https://brew-haven-re66.onrender.com/api/products',
-          { timeout: 8000 } // ⛔ infinite loading prevent
+          { timeout: 8000 }
         );
 
         const data = extractProducts(res);
-
         if (!data.length) throw new Error("No valid data");
 
         setProducts(data);
         setFiltered(data);
       } catch (err) {
-        console.error("❌ API Error:", err.message);
         setError(true);
 
-        // 🔥 fallback dummy (UI never empty)
         const dummy = [
-          {
-            id: 1,
-            name: "Cappuccino",
-            description: "Hot creamy coffee",
-            category: "Coffee"
-          },
-          {
-            id: 2,
-            name: "Latte",
-            description: "Smooth milk coffee",
-            category: "Coffee"
-          }
+          { id: 1, name: "Cappuccino", description: "Hot creamy coffee", category: "Coffee", price: 3.5 },
+          { id: 2, name: "Latte", description: "Smooth milk coffee", category: "Coffee", price: 4 }
         ];
 
         setProducts(dummy);
@@ -71,16 +52,15 @@ const Menu = () => {
     fetchProducts();
   }, []);
 
-  // 🔍 Filter Logic
   useEffect(() => {
-    let result = Array.isArray(products) ? products : [];
+    let result = products;
 
     if (category !== 'All') {
-      result = result.filter((p) => p.category === category);
+      result = result.filter(p => p.category === category);
     }
 
     if (search) {
-      result = result.filter((p) =>
+      result = result.filter(p =>
         p.name?.toLowerCase().includes(search.toLowerCase()) ||
         p.description?.toLowerCase().includes(search.toLowerCase())
       );
@@ -89,73 +69,65 @@ const Menu = () => {
     setFiltered(result);
   }, [search, category, products]);
 
-  // 🏷 Categories
   const categories = [
     'All',
-    ...new Set(
-      Array.isArray(products)
-        ? products.map((p) => p.category).filter(Boolean)
-        : []
-    )
+    ...new Set(products.map(p => p.category).filter(Boolean))
   ];
 
-  // ⏳ Loading
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
+      <div className="h-screen flex items-center justify-center bg-[#1c1410]">
+        <span className="loading loading-spinner loading-lg text-[#c69c6d]"></span>
       </div>
     );
   }
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center relative"
-      // style={{ backgroundImage: `url(${bgImage})` }}
-    >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
+    <div className="min-h-screen bg-[#1c1410] text-[#f5e9dc]">
 
-      <div className="relative z-10 container mx-auto px-4 md:px-8 py-12 text-white">
+      <div className="container mx-auto px-4 md:px-8 py-12">
 
-        {/* ⚠ Error Notice */}
+        {/* Error */}
         {error && (
-          <div className="mb-6 text-center text-yellow-300">
-            ⚠ API problem detected — showing demo data
+          <div className="mb-6 text-center text-yellow-400">
+            ⚠ API issue — showing demo items
           </div>
         )}
 
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-serif font-bold mb-4 italic text-primary">
-            Our Delicious Menu
+        <div className="text-center mb-14">
+          <h1 className="text-4xl md:text-5xl font-bold font-serif text-[#c69c6d]">
+            Coffee Menu
           </h1>
-          <p className="text-white/70 max-w-xl mx-auto">
-            Explore our wide selection of beverages and fresh treats.
+          <p className="text-[#d6c4b2]/70 mt-3 max-w-lg mx-auto">
+            Crafted with passion, brewed to perfection.
           </p>
         </div>
 
         {/* Search + Filter */}
-        <div className="flex flex-col md:flex-row gap-6 mb-12 items-center justify-between">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" size={20} />
+        <div className="flex flex-col md:flex-row gap-6 mb-10 items-center justify-between">
+
+          {/* Search */}
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#c69c6d]/70" size={18} />
             <input
               type="text"
-              placeholder="Search coffee, tea..."
-              className="input input-bordered w-full pl-12 rounded-full bg-white/10 text-white placeholder:text-white/50 border-white/20"
+              placeholder="Search coffee..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-11 pr-4 py-2 rounded-full bg-[#2a1f1a] border border-[#3b2a23] text-white placeholder:text-[#c69c6d]/50 focus:outline-none focus:ring-2 focus:ring-[#6f4e37]"
             />
           </div>
 
+          {/* Categories */}
           <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((cat, index) => (
+            {categories.map((cat, i) => (
               <button
-                key={index}
+                key={i}
                 onClick={() => setCategory(cat)}
-                className={`btn btn-sm rounded-full px-6 font-bold ${category === cat
-                    ? 'btn-primary'
-                    : 'bg-white/10 text-white border-none hover:bg-white/20'
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${category === cat
+                    ? 'bg-[#6f4e37] text-white shadow-md'
+                    : 'bg-[#2a1f1a] text-[#c69c6d] hover:bg-[#3b2a23]'
                   }`}
               >
                 {cat}
@@ -164,7 +136,7 @@ const Menu = () => {
           </div>
         </div>
 
-        {/* Products */}
+        {/* Product Grid */}
         {filtered.length > 0 ? (
           <motion.div
             layout
@@ -174,9 +146,10 @@ const Menu = () => {
               {filtered.map((product) => (
                 <motion.div
                   key={product._id || product.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
                   <CoffeeCard product={product} />
                 </motion.div>
@@ -184,9 +157,9 @@ const Menu = () => {
             </AnimatePresence>
           </motion.div>
         ) : (
-          <div className="text-center py-20 bg-white/10 rounded-3xl backdrop-blur-md">
-            <Search size={48} className="mx-auto text-white/30 mb-4" />
-            <p className="text-xl font-bold text-white/70">
+          <div className="text-center py-20 bg-[#2a1f1a] rounded-2xl">
+            <Search size={40} className="mx-auto text-[#c69c6d]/40 mb-3" />
+            <p className="text-lg text-[#d6c4b2] font-semibold">
               No items found
             </p>
             <button
@@ -194,9 +167,9 @@ const Menu = () => {
                 setSearch('');
                 setCategory('All');
               }}
-              className="btn btn-link text-primary mt-2"
+              className="mt-2 text-[#c69c6d] underline"
             >
-              Clear filters
+              Reset filters
             </button>
           </div>
         )}

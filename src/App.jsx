@@ -18,6 +18,7 @@ import About from './pages/About';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { PrivateRoute, AdminRoute } from './components/ProtectedRoute';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -39,6 +40,13 @@ function App() {
                 <Route path="/dashboard" element={
                   <PrivateRoute>
                     <Dashboard />
+                  </PrivateRoute>
+                } />
+
+                {/* Protected Routes */}
+                <Route path="/profile" element={
+                  <PrivateRoute>
+                    <Profile />
                   </PrivateRoute>
                 } />
                 
